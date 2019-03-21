@@ -49,3 +49,41 @@ https://www.instructables.com/id/How-to-Program-Arduino-Pro-Mini-Using-Arduino-U
 - connect reset to ground twice quickly
 - now you have 8 seconds to upload correct code to fix the brick
 
+
+3d model notes:
+wrist (length x hight x width): 59mm  x 42mm x 15mm x 2mm
+palm (length x hight x width): 86mm x 35mm x 15mm x 2mm
+fingers (length x hight x width): 19mm x 15mm x 1mm
+
+
+
+
+---------------pins--------------
+        
+        pro micro
+
+    - 2 = resistor = sda
+    - 3 = resistor = scl
+    - 6 = left mouse button
+    - 7 = middle mouse button 
+    - 8 = right mouse button
+    - ground = orange capacitor = blue capacitor = acc gnd = v reg GND = resistor button (x3)
+    - vcc = vin vreg = button (x3)
+
+        vreg (metal facing away)
+
+    - vin = yellow capacitor
+    - middle pin (vout) = blue capacitor stripe side = acc 3.3 vin 
+    - gnd (leftmost pin)
+
+        accelerometer 
+
+    - GND
+    - scl = resistor = 3
+    - sda = resistor = 2
+    - 3.3v = blue capacitor = vout vreg
+
+        buttons
+    
+    - output            - 5v
+    - resistor > GND    - nothing

@@ -3,10 +3,11 @@
 #include <Mouse.h>
 
 const int sensitivity = 1;  // Higher sensitivity value = slower mouse, should be <= about 500
-int mouseClickFlag = 0;
 
-int vx,vy,vxzero,vyzero;
-bool zeroRead = false;
+int vx,vy;
+int mousePins[] = {6,7,8};
+int mouseNames[] = {MOUSE_LEFT,MOUSE_MIDDLE,MOUSE_RIGHT};
+int mouseStates[] = {0,0,0};
 
 MMA8452Q accel;
 
@@ -18,42 +19,31 @@ void setup()
   accel.init();
   Serial.begin(9600);
   Serial.print("ready");
+  pinMode(mousePins[0],INPUT_PULLUP);
+  pinMode(mousePins[1],INPUT_PULLUP);
+  pinMode(mousePins[2],INPUT_PULLUP);
+  delay(1000);
+  
 }
 
 void loop()
 {
-//  if(!zeroRead){
-//    while(!accel.available())
-//    {
-//      Serial.print("not ready yet");
-//    }
-//    accel.read();
-//    Serial.print("read");
-//    vxzero = accel.cx;
-//    vyzero = accel.cy;
-//    printZero();
-//    zeroRead = true;
-//  }
   if(accel.available())
   {
     accel.read();
-//    printCalculatedAccels();
     delay(10);
     Mousemove();
+    mouseClick(0);
+    mouseClick(1);
+    mouseClick(2);
   }
 }
 
 void Mousemove()
 {
-  vx = (accel.cx+15)/sensitivity;
-  vy = -(accel.cz-100)/sensitivity;
-  
-//  vx = (accel.cx-vxzero);
-//  vy = -(accel.cy-vyzero);
-  vx = (accel.cx)*10;
-  vy = -(accel.cy)*10;
+  vx = -(accel.cx)*50;
+  vy = (accel.cy)*50;
 
-//  printZero();
 
   if(vx != 0)
   {
@@ -63,68 +53,24 @@ void Mousemove()
   {
     Mouse.move(0, vy, 0);  // move mouse on y axis
   }
-    
-  printVals();
-//  Mouse.move(accel.cx, -accel.cy, 0);  // move mouse on y axis
+  
 }
 
-void printZero()
+void mouseClick(int i)
 {
-  Serial.print("xzero: ");
-  Serial.print(vxzero);
-  Serial.print("\t");
-  Serial.print("yzero: ");
-  Serial.print(vyzero);
-  Serial.print("\t");
-  Serial.println();
+  if ((!digitalRead(mousePins[i])) && (!mouseStates[i]))
+  {
+    Serial.println("click");
+    mouseStates[i] = 1;
+    Mouse.begin();
+    Mouse.press(mouseNames[i]);
+    delay(10);
+  }
+  else if((digitalRead(mousePins[i])) && (mouseStates[i]))
+  {
+    Serial.println("not pressed");
+    mouseStates[i] = 0;
+    Mouse.release(mouseNames[i]);
+    delay(10);
+  }
 }
-
-void printVals()
-{
-  Serial.println(); // Print new line every time.
-  Serial.print("x: ");
-  Serial.print(vx);
-//  Serial.print("\t");
-//  Serial.print("xzero: ");
-//  Serial.print(vxzero);
-  Serial.print("\t");
-  Serial.print("accel x: ");
-  Serial.print(accel.cx);
-  Serial.print("\t");
-  Serial.print("y: ");
-  Serial.print(vy);
-//  Serial.print("\t");
-//  Serial.print("yzero: ");
-//  Serial.print(vyzero);
-  Serial.print("\t");
-  Serial.print("accel y: ");
-  Serial.print(accel.cy);
-  Serial.print("\t");
-  Serial.println(); // Print new line every time.
-}
-
-void printCalculatedAccels()
-{ 
-  Serial.print("x: ");
-  Serial.print(accel.cx, 3);
-  Serial.print("\t");
-  Serial.print("y: ");
-  Serial.print(accel.cy, 3);
-  Serial.print("\t");
-  Serial.print("z: ");
-  Serial.print(accel.cz, 3);
-  Serial.print("\t");
-  Serial.println(); // Print new line every time.
-}
-/* HID Joystick Mouse Example
-   by: Jim Lindblom
-   date: 1/12/2012
-   license: MIT License - Feel free to use this code for any purpose.
-   No restrictions. Just keep this license if you go on to use this
-   code in your future endeavors! Reuse and share.
-
-   This is very simplistic code that allows you to turn the 
-   SparkFun Thumb Joystick (http://www.sparkfun.com/products/9032)
-   into an HID Mouse. The select button on the joystick is set up
-   as the mouse left click. 
- */
